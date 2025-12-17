@@ -1,0 +1,44 @@
+name: Deploy VitePress to GitHub Pages
+
+# 触发条件：推送到 main 分支（可替换为你的分支名，如 master）
+on:
+  push:
+    branches: [main] # 注意：GitHub 新仓库默认分支是 main，旧仓库可能是 master
+
+# 工作流任务
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # 运行环境：Ubuntu 最新版
+    steps:
+      # 步骤1：拉取仓库代码
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # 拉取所有历史提交（用于 VitePress 的最后更新时间等功能）
+          fetch-depth: 0
+
+      # 步骤2：设置 Node.js 环境（选择你项目使用的 Node 版本，如 20）
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm' # 缓存 npm 依赖，加速构建
+
+      # 步骤3：安装依赖
+      - name: Install Dependencies
+        run: npm install
+
+      # 步骤4：构建 VitePress 项目（默认构建目录是 docs/.vitepress/dist）
+      - name: Build VitePress
+        run: npm run docs:build # 注意：需确保 package.json 中有该脚本
+
+      # 步骤5：部署到 GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          # GitHub Actions 自动生成的 Token，用于推送构建后的文件
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # 构建后的文件目录（VitePress 构建输出目录）
+          publish_dir: ./docs/.vitepress/dist
+          # 部署到 gh-pages 分支（GitHub Pages 默认读取该分支的文件）
+          publish_branch: gh-pages
