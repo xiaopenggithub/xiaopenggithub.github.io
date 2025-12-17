@@ -1,0 +1,10 @@
+node_modules
+docs/.vitepress/cache
+docs/.vitepress/dist
+dist
+.DS_Store
+.vscode
+.env
+.env.local
+.env.*.local
+npm-debug.log*
